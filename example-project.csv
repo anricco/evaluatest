@@ -1,0 +1,20 @@
+Project name:	example		
+Project type:				
+Versions:	30			# number of different versions
+Questions:	40	
+INPUT FILES:				
+questionlist:	example-questionlist.csv
+mainlatex:	example-main.tex			
+replacements:				
+keyfile:	example-keyin.csv				
+				
+OUTPUT FILES:				
+qnumber:	example-qnumber.csv			
+qcodes: 	example-qcodes.csv			
+qanswerorder:	example-qanswerorder.csv			
+qkey:   	example-qkey.csv			
+				
+givenanswers:	example-givenanswers.csv			
+				
+SUBSTITUTIONS				
+substitution1:	substitutions.csv			
