@@ -68,7 +68,7 @@ def transposed(lists):
    return map(lambda *row: list(row), *lists)
 
 
-# removes the first two rows and the firs column of a matrix
+# removes the first two rows and the first column of a matrix
 def stripMatrix(matrix):
     del matrix[0]
     del matrix[0]
@@ -190,8 +190,6 @@ def makePointsMatrix(verNumber, qNumber, AnswersMatrix, keyinMatrix):
     return pointsMatrix
 
 
-
-
 # It sums the scores on each line of a pointsMatrix
 def makeScoresList(verNumber, qNumber, pointsMatrix):
     scoresList = []
@@ -218,13 +216,14 @@ def makeResultsMatrix(scoresList):
     return resultsMatrix
 
 
+# same as RIC
 def compareAnswerString(answerString1, answerString2, qNumber, pointsMatrix):
     index = 0
     for k in range(0,qNumber):
         if answerString1[k] == answerString2[k]:
             index = index + 1
-
     return index
+
 
 def compareAnswerString2(answerString1, answerString2, qNumber, pointsMatrix):
     index = 0
@@ -247,8 +246,126 @@ def compareAnswerString3(answerString1, answerString2, qNumber, pointsMatrix):
 
 
 
-# takes the rearranged answers matrix and compares the answers for each couple of versions
-def makeCorrelationMatrix(answersMatrix, verNumber, qNumber):
+# Responses in Common (RIC):
+# This index calculates the number of responses in common between a given pair of examinees.
+def compareAnswerStringRIC(answerString1, answerString2, qNumber, pointsMatrix):
+    index = 0
+    for k in range(0,qNumber):
+        if answerString1[k] == answerString2[k]:
+            index = index + 1
+    return index
+
+
+# Errors in Common (EIC):
+# This index calculates the number of wrong answers in common between a given pair of examinees.
+def compareAnswerStringEIC(answerString1, answerString2, qNumber, pointsMatrix):
+    index = 0
+    for k in range(0,qNumber):
+        if answerString1[k] != 'A' and answerString2[k] != 'A':
+            index = index + 1
+    return index
+
+
+# Exact Errors in Common (EEIC):
+# This index calculates the number of wrong equal answers between a given pair of examinees.
+def compareAnswerStringEEIC(answerString1, answerString2, qNumber, pointsMatrix):
+    index = 0
+    for k in range(0,qNumber):
+        if answerString1[k] != 'A' and answerString1[k] == answerString2[k]:
+            index = index + 1
+    return index
+
+
+# Harpp and Hogan (1993) - HH:
+# This index computes the ratio of EEIC Exact Errors in Common to EIC Errors in Common
+def compareAnswerStringHH(answerString1, answerString2, qNumber, pointsMatrix):
+    index = 0
+    indexEIC = compareAnswerStringEIC(answerString1, answerString2, qNumber, pointsMatrix)
+    indexEEIC = compareAnswerStringEEIC(answerString1, answerString2, qNumber, pointsMatrix)
+    index = round(float(indexEEIC)/float(indexEIC),2)
+    return index
+
+
+# Diff
+# This index computes the number of items with a different response. It is used by HHJ
+def compareAnswerStringDiff(answerString1, answerString2, qNumber, pointsMatrix):
+    index = 0
+    for k in range(0,qNumber):
+        if answerString1[k] != answerString2[k]:
+            index = index + 1
+    return index
+
+
+# Harpp, Hogan, and Jennings (1996) - HHJ:
+# This index computes the ratio of EEIC Exact Errors in Common to EIC Errors in Common
+def compareAnswerStringHHJ(answerString1, answerString2, qNumber, pointsMatrix):
+    index = 0
+    indexDiff = compareAnswerStringDiff(answerString1, answerString2, qNumber, pointsMatrix)
+    #print answerString1
+    #print answerString2
+    #print indexDiff
+    indexEEIC = compareAnswerStringEEIC(answerString1, answerString2, qNumber, pointsMatrix)
+    if indexDiff != 0:
+        index = round(float(indexEEIC)/float(indexDiff),2) #
+    else:
+        index = "-"
+    return index
+
+
+
+# # takes the rearranged answers matrix and compares the answers for each couple of versions
+# def makeCorrelationMatrix(answersMatrix, verNumber, qNumber):
+#
+#     correlationMatrix = []
+#
+#     for j1 in range(0,verNumber+1):
+#         correlationLine = [0 for x in range(0,verNumber+1)]
+#         for j2 in range(0,verNumber):
+#             if j1 != j2:
+#                 correlationLine[j2:j2+1] = [compareAnswerString(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
+#             else:
+#                 correlationLine[j2:j2+1] = [0]
+#
+#         correlationMatrix.append(correlationLine)
+#
+#     return correlationMatrix
+
+
+# def makeCorrelationMatrix2(answersMatrix, verNumber, qNumber):
+#
+#     correlationMatrix = []
+#
+#     for j1 in range(0,verNumber+1):
+#         correlationLine = [0 for x in range(0,verNumber+1)]
+#         for j2 in range(0,verNumber):
+#             if j1 != j2:
+#                 correlationLine[j2:j2+1] = [compareAnswerString2(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
+#             else:
+#                 correlationLine[j2:j2+1] = [0]
+#         correlationMatrix.append(correlationLine)
+#
+#     return correlationMatrix
+
+
+# def makeCorrelationMatrix3(answersMatrix, verNumber, qNumber):
+#
+#     correlationMatrix = []
+#
+#     for j1 in range(0,verNumber+1):
+#         correlationLine = [0 for x in range(0,verNumber+1)]
+#         for j2 in range(0,verNumber):
+#             if j1 != j2:
+#                 correlationLine[j2:j2+1] = [compareAnswerString3(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
+#             else:
+#                 correlationLine[j2:j2+1] = [0]
+#         correlationMatrix.append(correlationLine)
+#
+#     return correlationMatrix
+
+
+# RIC version
+# takes the rearranged answers matrix computes the given index for each couple of versions
+def makeCorrelationMatrixRIC(answersMatrix, verNumber, qNumber):
 
     correlationMatrix = []
 
@@ -256,7 +373,7 @@ def makeCorrelationMatrix(answersMatrix, verNumber, qNumber):
         correlationLine = [0 for x in range(0,verNumber+1)]
         for j2 in range(0,verNumber):
             if j1 != j2:
-                correlationLine[j2:j2+1] = [compareAnswerString(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
+                correlationLine[j2:j2+1] = [compareAnswerStringRIC(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
             else:
                 correlationLine[j2:j2+1] = [0]
 
@@ -265,7 +382,9 @@ def makeCorrelationMatrix(answersMatrix, verNumber, qNumber):
     return correlationMatrix
 
 
-def makeCorrelationMatrix2(answersMatrix, verNumber, qNumber):
+# EIC version
+# takes the rearranged answers matrix computes the given index for each couple of versions
+def makeCorrelationMatrixEIC(answersMatrix, verNumber, qNumber):
 
     correlationMatrix = []
 
@@ -273,15 +392,18 @@ def makeCorrelationMatrix2(answersMatrix, verNumber, qNumber):
         correlationLine = [0 for x in range(0,verNumber+1)]
         for j2 in range(0,verNumber):
             if j1 != j2:
-                correlationLine[j2:j2+1] = [compareAnswerString2(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
+                correlationLine[j2:j2+1] = [compareAnswerStringEIC(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
             else:
                 correlationLine[j2:j2+1] = [0]
+
         correlationMatrix.append(correlationLine)
 
     return correlationMatrix
 
 
-def makeCorrelationMatrix3(answersMatrix, verNumber, qNumber):
+# EEIC version
+# takes the rearranged answers matrix computes the given index for each couple of versions
+def makeCorrelationMatrixEEIC(answersMatrix, verNumber, qNumber):
 
     correlationMatrix = []
 
@@ -289,12 +411,56 @@ def makeCorrelationMatrix3(answersMatrix, verNumber, qNumber):
         correlationLine = [0 for x in range(0,verNumber+1)]
         for j2 in range(0,verNumber):
             if j1 != j2:
-                correlationLine[j2:j2+1] = [compareAnswerString3(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
+                correlationLine[j2:j2+1] = [compareAnswerStringEEIC(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
             else:
                 correlationLine[j2:j2+1] = [0]
+
         correlationMatrix.append(correlationLine)
 
     return correlationMatrix
+
+
+# HH version
+# takes the rearranged answers matrix computes the given index for each couple of versions
+def makeCorrelationMatrixHH(answersMatrix, verNumber, qNumber):
+
+    correlationMatrix = []
+
+    for j1 in range(0,verNumber+1):
+        correlationLine = [0 for x in range(0,verNumber+1)]
+        for j2 in range(0,verNumber):
+            if j1 != j2:
+                correlationLine[j2:j2+1] = [compareAnswerStringHH(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
+            else:
+                correlationLine[j2:j2+1] = [0]
+
+        correlationMatrix.append(correlationLine)
+
+    return correlationMatrix
+
+
+# HH version
+# takes the rearranged answers matrix computes the given index for each couple of versions
+def makeCorrelationMatrixHHJ(answersMatrix, verNumber, qNumber):
+
+    correlationMatrix = []
+
+    for j1 in range(0,verNumber+1):
+        correlationLine = [0 for x in range(0,verNumber+1)]
+        for j2 in range(0,verNumber):
+            if j1 != j2:
+                correlationLine[j2:j2+1] = [compareAnswerStringHHJ(answersMatrix[j1], answersMatrix[j2], qNumber," ")]
+            else:
+                correlationLine[j2:j2+1] = [0]
+        #print correlationLine
+
+        correlationMatrix.append(correlationLine)
+
+    return correlationMatrix
+
+
+
+
 
 
 
@@ -392,20 +558,32 @@ def main():
 
     # print rearrangedGivenAnswersMatrix[0]
 
-    correlationMatrix = makeCorrelationMatrix(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
-    # print correlationMatrix
+    # correlationMatrix = makeCorrelationMatrix(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
+    # # print correlationMatrix
+    #
+    # matrixToCsvFile(correlationMatrix, projectName +  "-correlation" + ".csv", mainpath + "/output")
 
-    matrixToCsvFile(correlationMatrix, projectName +  "-correlation1" + ".csv", mainpath + "/output")
+    correlationMatrixRIC = makeCorrelationMatrixRIC(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
+    matrixToCsvFile(correlationMatrixRIC, projectName +  "-RIC-correlation" + ".csv", mainpath + "/output")
 
-    correlationMatrix2 = makeCorrelationMatrix2(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
-    # print correlationMatrix2
+    correlationMatrixHH = makeCorrelationMatrixHH(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
+    matrixToCsvFile(correlationMatrixHH, projectName +  "-HH-correlation" + ".csv", mainpath + "/output")
 
-    matrixToCsvFile(correlationMatrix2,  projectName + "-correlation2" + ".csv", mainpath + "/output")
+    correlationMatrixHHJ = makeCorrelationMatrixHHJ(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
+    matrixToCsvFile(correlationMatrixHHJ, projectName +  "-HHJ-correlation" + ".csv", mainpath + "/output")
 
-    correlationMatrix3 = makeCorrelationMatrix3(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
-    # print correlationMatrix3
 
-    matrixToCsvFile(correlationMatrix3,  projectName + "-correlation3" + ".csv", mainpath + "/output")
+
+
+    # correlationMatrix2 = makeCorrelationMatrix2(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
+    # # print correlationMatrix2
+    #
+    # matrixToCsvFile(correlationMatrix2,  projectName + "-correlation2" + ".csv", mainpath + "/output")
+    #
+    # correlationMatrix3 = makeCorrelationMatrix3(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
+    # # print correlationMatrix3
+    #
+    # matrixToCsvFile(correlationMatrix3,  projectName + "-correlation3" + ".csv", mainpath + "/output")
 
 
 main()
