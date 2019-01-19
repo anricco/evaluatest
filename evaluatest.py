@@ -4,7 +4,7 @@
 #                                                                              #
 #                                                                              #
 #                                EVALUATEST                                    #
-#                            (Mac OS X version)                                #
+#                         (Mac OS X and Linux version)                         #
 #                               Antonio Ricco                                  #
 #                                                                              #
 #------------------------------------------------------------------------------#
