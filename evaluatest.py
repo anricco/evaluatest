@@ -14,10 +14,13 @@ import sys
 import fileinput
 
 import numpy
-#import math
+import math
 
 # to add command line options
 import argparse
+
+# for the binomial coefficients
+import scipy.special
 
 #import random
 #import itertools
@@ -313,6 +316,28 @@ def compareAnswerStringHHJ(answerString1, answerString2, qNumber, pointsMatrix):
 
 
 
+# Bellezza & Bellezza (1989) - Random version with equally probable distractors:
+# This index the probability of the same EEIC given the EIC
+def compareAnswerStringBBRandom(answerString1, answerString2, qNumber, pointsMatrix, qOptions):
+    pFactor = 1.0/qOptions
+
+    index = 0
+    indexEIC = compareAnswerStringEIC(answerString1, answerString2, qNumber, pointsMatrix)
+    # print "indexEIC = " + str(indexEIC)
+    indexEEIC = compareAnswerStringEEIC(answerString1, answerString2, qNumber, pointsMatrix)
+    # print "indexEEIC = " + str(indexEEIC)
+
+    for k in range(indexEEIC, indexEIC+1):
+        # print k
+        probability = scipy.special.binom(indexEIC, k) * ( pFactor ** k ) * (1-pFactor) ** (indexEIC - k)
+        index = index + probability
+
+    return index
+
+
+
+
+
 # # takes the rearranged answers matrix and compares the answers for each couple of versions
 # def makeCorrelationMatrix(answersMatrix, verNumber, qNumber):
 #
@@ -460,6 +485,24 @@ def makeCorrelationMatrixHHJ(answersMatrix, verNumber, qNumber):
 
 
 
+# BBRandom version
+# takes the rearranged answers matrix computes the given index for each couple of versions
+def makeCorrelationMatrixBBRandom(answersMatrix, verNumber, qNumber, qOptions):
+
+    correlationMatrix = []
+
+    for j1 in range(0,verNumber+1):
+        correlationLine = [0 for x in range(0,verNumber+1)]
+        for j2 in range(0,verNumber):
+            if j1 != j2:
+                correlationLine[j2:j2+1] = [compareAnswerStringBBRandom(answersMatrix[j1], answersMatrix[j2], qNumber, " ", qOptions)]
+            else:
+                correlationLine[j2:j2+1] = [0]
+        #print correlationLine
+
+        correlationMatrix.append(correlationLine)
+
+    return correlationMatrix
 
 
 
@@ -572,6 +615,8 @@ def main():
     correlationMatrixHHJ = makeCorrelationMatrixHHJ(rearrangedGivenAnswersMatrix, versionNumber, questionNumber)
     matrixToCsvFile(correlationMatrixHHJ, projectName +  "-HHJ-correlation" + ".csv", mainpath + "/output")
 
+    correlationMatrixBBRandom = makeCorrelationMatrixBBRandom(rearrangedGivenAnswersMatrix, versionNumber, questionNumber, 4)
+    matrixToCsvFile(correlationMatrixBBRandom, projectName +  "-BBRandom-correlation" + ".csv", mainpath + "/output")
 
 
 
